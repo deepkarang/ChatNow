@@ -1,0 +1,77 @@
+<!--doctype html-->
+
+<html lang="en">
+    <head>
+    <link rel="stylesheet" href="stylesheet.css">
+    <link href="http://fonts.googleapis.com/css?family=Corben:bold" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Nobile" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap-theme.min.css">
+    </head>
+    <body id="page-top">
+      <div class="site-wrapper">
+      <nav class="navbar navbar-default navbar-fixed-top affix-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+          </button>
+        <a class="navbar-brand page-scroll" href="#page-top">Welcome to ChatNow!</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="page-scroll" href="#about">About</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#services">Services</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#portfolio">Portfolio</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+      </div>
+      </nav>
+        <div id="mainbody">
+          <div id="welcomemsg"></div>
+            <div id="usernames"></div>
+          <div id="messagediv"></div>
+
+           <script src="/jquery/dist/jquery.js"></script>
+           <script src="/socket.io/socket.io.js"></script>
+           <script src="bootstrap/dist/js/bootstrap.min.js"></script>
+           <script>
+           var username;
+           var clickdata;
+           function chatpage(data){
+             location.href="/chat.html";
+             socket.emit('displaymsg', data);
+           }
+           $(document).ready(function() {
+             username = prompt("Please enter your username:");
+             if (username!=null) {
+                 $('#welcomemsg').append("<tag1> Hello " + username + " </tag1> <br/>");
+                 $('#usernames').append("<u>Friends</u><br/>");
+             }
+             else $('#welcomemsg').append("<tag1> Please reload the page </tag1> <br/>");
+           });
+
+           var socket = io.connect('http://localhost:4200');
+
+           socket.on('connect',function(data){
+             socket.emit('join', username);
+           });
+           socket.on('logs',function (data){
+             $('#usernames').append(data);
+             $('#usernames').append("<br/>");
+           });
+
+           </script>
+         </div>
+       </div>
+    </body>
+</html>
