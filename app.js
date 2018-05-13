@@ -3,6 +3,7 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var mysql = require('mysql');
+var path = require('path');
 var connection  = mysql.createConnection({
   host: '127.0.0.1',
   user: 'root',
@@ -18,6 +19,10 @@ app.use(express.static(__dirname));
 
 app.get('/', function(req, res,next) {
     res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/about', function(req, res, next) {
+   res.sendFile(__dirname + '/about.html'); 
 });
 
 io.on('connection', function(client) {
