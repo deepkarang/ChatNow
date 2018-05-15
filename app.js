@@ -1,3 +1,5 @@
+// Establishing dependencies with required modules
+// Creating http server, db connection, socket.io ports 
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
@@ -17,6 +19,7 @@ var receivername;
 __dirname = path.resolve();
 app.use(express.static(__dirname));
 
+//Basic get request to server to get routed to index.html
 app.get('/', function(req, res,next) {
     res.sendFile(__dirname + '/index.html');
 });
@@ -25,9 +28,12 @@ app.get('/about', function(req, res, next) {
    res.sendFile(__dirname + '/about.html'); 
 });
 
+// Connfigure server-side logic to only run once connection is established by the client
 io.on('connection', function(client) {
     console.log('Client connected...');
-
+    
+    // Initially gather login info (username) and populate friend list accordingly
+    // Called when user first opens page
     client.on('join', function(data) {
         username = data;
         var post = {Username: username, Current: 1};
@@ -75,6 +81,7 @@ io.on('connection', function(client) {
        }); 
     });
 
+    // Returns list of messages from active user 
     client.on('messages', function(data) {
           var datetime = new Date().toString;
           var currindicator = {Current: 1};
