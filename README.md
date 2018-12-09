@@ -1,5 +1,5 @@
 # ChatNow
-Basic instant messaging app in node.js
+Web-based instant messaging app in node.js
 
 # Steps to run application:
 1. ```git clone``` the repository or download source files onto your machine
