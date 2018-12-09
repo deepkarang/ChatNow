@@ -6,12 +6,8 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var mysql = require('mysql');
 var path = require('path');
-var connection  = mysql.createConnection({
-  host: '127.0.0.1',
-  user: 'root',
-  password: '',
-  database: 'messages'
-});
+var credentials = require('./config').credentials;
+var connection  = mysql.createConnection(credentials);
 var username;
 var prevmessages;
 var receivername;
@@ -20,7 +16,7 @@ __dirname = path.resolve();
 app.use(express.static(__dirname));
 
 //Basic get request to server to get routed to index.html
-app.get('/', function(req, res,next) {
+app.get('/', function(req, res, next) {
     res.sendFile(__dirname + '/index.html');
 });
 
@@ -35,67 +31,87 @@ io.on('connection', function(client) {
     // Initially gather login info (username) and populate friend list accordingly
     // Called when user first opens page
     client.on('join', function(data) {
-        username = data;
-        var post = {Username: username, Current: 1};
-        var current = {Current: 0};
-        connection.query('UPDATE users SET ? WHERE Username IS NOT NULL', current);
-        var registeruser = connection.query('INSERT INTO users SET ?', post);
-        var loadedmsgs = connection.query('SELECT DISTINCT Username FROM users', function(err,rows,fields){
-          if (err) throw err;
-          if (rows!=null){
-              for (var i in rows){
-              client.emit('logs',rows[i].Username);
-              }
-          }
-          
+        var clientName = data;
+        if (!clientName) return;
+        //Check if user is already registered
+        let getUserRegistration = "SELECT * FROM `users` WHERE `username`='"+clientName+"'";
+        connection.query(getUserRegistration, function(err,rows, fields) {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+            if (rows!=null){
+                if (rows.length < 1){
+                    //No preexisting users with the same name
+                    let initializeUser = "INSERT INTO `users` (username) VALUES (" + JSON.stringify(clientName) + ")";
+                    console.log(initializeUser);
+                    connection.query(initializeUser, function(err, rows, fields) {
+                        if (err) {
+                            console.log(err);
+                            throw err;
+                        }
+                    });
+                    return;
+                } else {
+                    let user = rows[0];
+                    client.emit('currentUserInfo', user);
+                }
+            }
+        });
+        let getFriends = "SELECT id, username FROM users WHERE username <> '" + clientName + "'";
+            console.log(getFriends);
+            connection.query(getFriends, function(err,rows,fields){
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+                if (rows!=null){
+                    for (var i in rows){
+                        var res = {
+                            name: rows[i].username,
+                            id: rows[i].id
+                        };
+                        client.emit('friendslist',res);
+                    }
+                }
+            });
+    });
+
+    client.on('getConversation', function(data) {
+        let senderName = data.sender;
+        let receiverName = data.receiver;
+        let getConversationQuery = "SELECT * FROM `messagelog` "+
+                                    "WHERE (sender=" + JSON.stringify(senderName) + " AND receiver=" + JSON.stringify(receiverName) +
+                                    ") OR (sender=" + JSON.stringify(receiverName) + " AND receiver=" + JSON.stringify(senderName) + ")";
+        console.log(getConversationQuery);
+        connection.query(getConversationQuery, function (err,rows, fields) {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+            let messages = [];
+            for (var i=0;i<rows.length;i++) {
+                messages.push(rows[i].sender + ": " + rows[i].message + "     [" + rows[i].created_at.toLocaleString() + "]");
+            }
+            client.emit('receivedConversation', messages);
         });
     });
 
-    client.on('displaymsg', function(data){
-        var post = {Username: data};
-        client.emit('username', post);
-        var loadedmsgs = connection.query('SELECT Message FROM messagelog WHERE ?', post , function(err,rows,fields){
-          if (err) throw err;
-          prevmessages = rows;
+    client.on('sendMessage', function(data) {
+        let sendMessageQuery = "INSERT INTO `messagelog` (sender, message, receiver) VALUES ("+JSON.stringify(data.sender)+","+JSON.stringify(data.message)+","+JSON.stringify(data.receiver)+")";
+        console.log(sendMessageQuery);
+        connection.query(sendMessageQuery, function(err,rows,fields) {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+            return;
         });
-    });
-    
-    client.on('receiver', function(data){
-       receivername = data;
-       var post = {Receivername: data};
-       var loadedmsgs = connection.query('SELECT Message FROM messagelog WHERE ?', post) 
-    });
-
-    client.on('joinchat', function(){
-      for (var i in prevmessages) client.emit('prevmsgs', prevmessages[i].Message);
     });
 
     client.on('disconnect', function() {
-       console.log('Client disconnected...');
-    });
-    
-    client.on('loadmsgs',function(data){
-       var post = {Username: data};
-       var loadedmsgs = connection.query('SELECT Message FROM messagelog WHERE ?',post, function(err, rows, fields){
-           for (var i in loadedmsgs) client.emit('showmsgs', loadedmsgs[i].Message);
-       }); 
-    });
-
-    // Returns list of messages from active user 
-    client.on('messages', function(data) {
-          var datetime = new Date().toString;
-          var currindicator = {Current: 1};
-          var currUser = connection.query('SELECT * FROM users WHERE ?', currindicator, function(err, rows, fields){
-              for (var i in currUser){
-                  console.log(rows);
-                  var post = {Username: (rows), Message: data, Datetime: datetime};
-                  var sentmsgs = connection.query('INSERT INTO messagelog SET ?', post);
-                  break;
-              }                 
-          });
-          
-          client.emit('broad', data);
-    });
+        console.log('Client disconnected...');
+     });
 
 });
 

@@ -28,31 +28,84 @@
     <div id="mainbody">
       <div id="welcomemsg"></div>
       <div id="usernames"></div>
-      <div id="messagediv"></div>
-       <script src="/socket.io/socket.io.js"></script>
-       <script>
-       var username;
-       var clickdata;
-       $(document).ready(function() {
-         username = prompt("Please enter your username:");
-         if (username!=null) {
-             $('#welcomemsg').append("<tag1> Hello " + username + " </tag1> <br/>");
-             $('#usernames').append("<u>Friends</u><br/>");
-         }
-         else $('#welcomemsg').append("<tag1> Please reload the page </tag1> <br/>");
-       });
+      <div id="conversationHeading"></div>
+      <div id="messages"></div>
+      <form id="chat_form">
+        <input id="chat_input" type="text">
+        <input type="submit" class="btn btn-lg btn-primary" value="Send">
+      </form>
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+      var username;
+      var userid;
+      var clickdata;
+      var selectedFriend;
+      var selectedFriendId;
+      var socket = io.connect('http://localhost:4200');
+      $('#chat_form').hide();
 
-       var socket = io.connect('http://localhost:4200');
+      $(document).ready(function() {
+        username = prompt("Please enter your username:");
+        if (username!=null) {
+          socket.emit('join', username);
+          $('#welcomemsg').append("<tag1> Hello " + username + " </tag1> <br/>");
+          $('#usernames').append("<u>Here are your friends on ChatNow!</u><br/>");
+        }
+        else $('#welcomemsg').append("<tag1> Please reload the page </tag1> <br/>");
+      });
 
-       socket.on('connect',function(data){
-         socket.emit('join', username);
-       });
-       socket.on('logs',function (data){
-         $('#usernames').append(data);
-         $('#usernames').append("<br/>");
-       });
+      function getConversationScreenReady(friendName) {
+        $('#welcomemsg').hide();
+        $("#usernames").hide();
+        $('#chat_form').show();
+        $('#conversationHeading').append("Conversation with: " + friendName);
+      }
 
-       </script>
+      function getConversation(sender, receiver) {
+        return function() {
+          selectedFriend = receiver;
+          var params = {
+            sender : sender,
+            receiver : receiver
+          };
+          socket.emit('getConversation', params);
+          getConversationScreenReady(receiver);
+        }
+      }
+
+      socket.on('currentUserInfo', function(data) {
+        userid = data.id;
+      });
+      socket.on('friendslist',function (data){
+        let friend = data;
+        let friendElement = "<div id=" + friend.id + ">" + friend.name + "</div>";
+        $('#usernames').append(friendElement);
+        $('#usernames').append("<br/>");
+        document.getElementById(data.id).addEventListener('click', getConversation(username, friend.name));
+      });
+      socket.on('receivedConversation', function(data) {
+        let messages = data;
+        $('#messages').empty();
+        messages.forEach(element => {
+          $('#messages').append("<div>" + element + "</div>");
+          $('#messages').append("<br/>");
+        });
+      })
+
+      $('#chat_form').submit(function(e){
+              e.preventDefault();
+              var msg = $('#chat_input').val();
+              $('#chat_input').val("");
+              let params = {
+                receiver : selectedFriend,
+                message : msg,
+                sender : username
+              };
+              socket.emit('sendMessage', params);
+              socket.emit('getConversation', {sender: username, receiver: selectedFriend});
+           });
+
+      </script>
      </div>
     </body>
 </html>
