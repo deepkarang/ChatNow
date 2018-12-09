@@ -1,5 +1,4 @@
 # ChatNow
-Work in Progress:
 Basic instant messaging app in node.js
 
 # Steps to run application:
