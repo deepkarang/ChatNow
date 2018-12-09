@@ -1,0 +1,125 @@
+
+.cover-heading{
+  margin: 0 auto;
+  width: 500px;
+  text-align: center;
+  color: black;
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-weight: 400;
+}
+
+.welcomeMsg {
+  font-family: 'Aileron', sans-serif;
+  font-size: 28px;
+}
+
+.friendsListHeading {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: 'Aileron', sans-serif;
+  font-size: 16px;
+}
+
+.friendName {
+  width: 10%;
+  cursor: pointer;
+}
+
+.conversationHeading {
+  margin-bottom: 20px;
+  font-family: 'Aileron', sans-serif;
+  font-size: 20px;
+}
+
+.usernames {
+  margin-top: 10px;
+}
+
+.messages {
+  padding: 40 80 40 80;
+  display: flex;
+  flex-direction: column;
+}
+
+.senderMsg {
+  align-self: flex-end;
+}
+
+.sentDate {
+  align-self: flex-end;
+  font-size: 8px;
+}
+
+.receiverMsg {
+  align-self: flex-start;
+}
+
+.receivedDate {
+  align-self: flex-start;
+  font-size: 8px;
+}
+
+.chatForm {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+input[type="text"]{
+  min-width:400px;
+  margin-right: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Corben', Georgia, Times, serif;
+}
+p, div {
+    font-family: 'Nobile', Helvetica, Arial, sans-serif;
+}
+
+.superParent{
+  padding: 30 30 30 30;
+  position: relative;
+}
+
+body{
+    margin: 0 auto;
+    /*background-size: 100% 100%;*/
+}
+
+
+
+@font-face {
+  font-family: 'Aileron';
+  font-style: normal;
+  font-weight: normal;
+  src: url('/styles/fonts/Aileron-Light.otf') format('truetype');
+}
+
+i {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+
+.right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+
+.left {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}

@@ -2,6 +2,7 @@
 
 <html lang="en">
     <head>
+        <link rel="stylesheet" href="styles/stylesheet.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     </head>
@@ -25,14 +26,15 @@
         </ul>
       </div>
     </nav>
-    <div id="mainbody">
-      <div id="welcomemsg"></div>
-      <div id="usernames"></div>
-      <div id="conversationHeading"></div>
-      <div id="messages"></div>
-      <form id="chat_form">
-        <input id="chat_input" type="text">
-        <input type="submit" class="btn btn-lg btn-primary" value="Send">
+    <div id="mainbody" class="superParent">
+      <div id="welcomemsg" class="welcomeMsg"></div>
+      <div id="friendsListHeading" class="friendsListHeading"></div>
+      <div id="usernames" class="usernames"></div>
+      <div id="conversationHeading" class="conversationHeading"></div>
+      <div id="messages" class="messages"></div>
+      <form id="chat_form" class="chatForm">
+        <div><input id="chat_input" type="text"></div>
+        <div><input type="submit" class="btn btn-lg btn-primary" value="Send"></div>
       </form>
       <script src="/socket.io/socket.io.js"></script>
       <script>
@@ -48,14 +50,15 @@
         username = prompt("Please enter your username:");
         if (username!=null) {
           socket.emit('join', username);
-          $('#welcomemsg').append("<tag1> Hello " + username + " </tag1> <br/>");
-          $('#usernames').append("<u>Here are your friends on ChatNow!</u><br/>");
+          $('#welcomemsg').append("Hello " + username);
+          $('#friendsListHeading').append("Here are your friends on ChatNow!");
         }
         else $('#welcomemsg').append("<tag1> Please reload the page </tag1> <br/>");
       });
 
       function getConversationScreenReady(friendName) {
         $('#welcomemsg').hide();
+        $('#friendsListHeading').hide();
         $("#usernames").hide();
         $('#chat_form').show();
         $('#conversationHeading').append("Conversation with: " + friendName);
@@ -76,18 +79,29 @@
       socket.on('currentUserInfo', function(data) {
         userid = data.id;
       });
+
       socket.on('friendslist',function (data){
         let friend = data;
-        let friendElement = "<div id=" + friend.id + ">" + friend.name + "</div>";
+        let friendElement = "<div id=" + friend.id + " class='friendName'> <i class='arrow right'></i>   " + friend.name + "</div>";
         $('#usernames').append(friendElement);
         $('#usernames').append("<br/>");
         document.getElementById(data.id).addEventListener('click', getConversation(username, friend.name));
       });
+
       socket.on('receivedConversation', function(data) {
         let messages = data;
         $('#messages').empty();
-        messages.forEach(element => {
-          $('#messages').append("<div>" + element + "</div>");
+        messages.forEach(obj => {
+          let content = obj.message;
+          let sender = obj.sender;
+          let timestamp = obj.time;
+          if (sender===username) {
+            $('#messages').append("<div class='senderMsg'>" + content + "</div>");
+            $('#messages').append("<div class='sentDate'>" + timestamp + "</div>");
+          } else {
+            $('#messages').append("<div class='receiverMsg'>" + content + "</div>");
+            $('#messages').append("<div class='receivedDate'>" + timestamp + "</div>");
+          }
           $('#messages').append("<br/>");
         });
       })

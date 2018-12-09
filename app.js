@@ -17,11 +17,11 @@ app.use(express.static(__dirname));
 
 //Basic get request to server to get routed to index.html
 app.get('/', function(req, res, next) {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/src/index.html');
 });
 
 app.get('/about', function(req, res, next) {
-   res.sendFile(__dirname + '/about.html'); 
+   res.sendFile(__dirname + '/src/about.html'); 
 });
 
 // Connfigure server-side logic to only run once connection is established by the client
@@ -91,7 +91,12 @@ io.on('connection', function(client) {
             }
             let messages = [];
             for (var i=0;i<rows.length;i++) {
-                messages.push(rows[i].sender + ": " + rows[i].message + "     [" + rows[i].created_at.toLocaleString() + "]");
+                var obj = {
+                    sender: rows[i].sender,
+                    message: rows[i].message,
+                    time: rows[i].created_at.toLocaleString()
+                }
+                messages.push(obj);
             }
             client.emit('receivedConversation', messages);
         });

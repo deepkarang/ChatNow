@@ -1,2 +1,7 @@
+#Dependencies
 node_modules/
+
+#Configuration
 config.json
+
+.DS_Store
