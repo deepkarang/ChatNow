@@ -44,7 +44,6 @@ io.on('connection', function(client) {
                 if (rows.length < 1){
                     //No preexisting users with the same name
                     let initializeUser = "INSERT INTO `users` (username) VALUES (" + JSON.stringify(clientName) + ")";
-                    console.log(initializeUser);
                     connection.query(initializeUser, function(err, rows, fields) {
                         if (err) {
                             console.log(err);
@@ -59,7 +58,6 @@ io.on('connection', function(client) {
             }
         });
         let getFriends = "SELECT id, username FROM users WHERE username <> '" + clientName + "'";
-            console.log(getFriends);
             connection.query(getFriends, function(err,rows,fields){
                 if (err) {
                     console.log(err);
@@ -83,7 +81,6 @@ io.on('connection', function(client) {
         let getConversationQuery = "SELECT * FROM `messagelog` "+
                                     "WHERE (sender=" + JSON.stringify(senderName) + " AND receiver=" + JSON.stringify(receiverName) +
                                     ") OR (sender=" + JSON.stringify(receiverName) + " AND receiver=" + JSON.stringify(senderName) + ")";
-        console.log(getConversationQuery);
         connection.query(getConversationQuery, function (err,rows, fields) {
             if (err) {
                 console.log(err);
@@ -104,7 +101,6 @@ io.on('connection', function(client) {
 
     client.on('sendMessage', function(data) {
         let sendMessageQuery = "INSERT INTO `messagelog` (sender, message, receiver) VALUES ("+JSON.stringify(data.sender)+","+JSON.stringify(data.message)+","+JSON.stringify(data.receiver)+")";
-        console.log(sendMessageQuery);
         connection.query(sendMessageQuery, function(err,rows,fields) {
             if (err) {
                 console.log(err);
