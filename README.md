@@ -1,5 +1,5 @@
 # ChatNow
-Web-based instant messaging app in node.js
+Extremely lightweight web-based instant messaging app written in basic HTML, CSS, and node.js for the back-end. Leverages socket.io for real-time communication with friends.
 
 # Steps to run application:
 1. ```git clone``` the repository or download source files onto your machine
