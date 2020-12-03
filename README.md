@@ -21,6 +21,6 @@ If you're really feeling adventurous, feel free to fork this. In order to chat w
 3. Serve this updated index.html through some public URL. Anybody using link that should be able to talk to anybody else who has access to it(*).
 
 ## Disclaimer(*)
-This was a learning project for me when I was starting with web development. Security is obviously not high standard here, the purpose of this project is was just to demonstrate how real-time chat functionality can be achieved and see how node/express/socket worked for myself. It was created quickly & just for fun so keep in mind that publicizing mechanism mentioned in this section is just provided for your information and would actually open up a communication channel with everyone who knows what the URL is.
+This was a learning project for me when I was starting with web development. Security is obviously not high standard here, and neither was meticulous code design a high priority. The purpose of this project is was just to demonstrate how real-time chat functionality can be achieved and see how node/express/socket worked for myself. It was created quickly & just for fun so keep in mind that publicizing mechanism mentioned in this section is just provided for your information and would actually open up a communication channel with everyone who knows what the URL is.
 
 Happy Chatting!
